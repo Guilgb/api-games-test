@@ -9,6 +9,7 @@ import { RawgProvider } from '../provider/rawg-provider/implementations/rawg-pro
 import { DbGamesService } from '../db/service/db-games.service';
 import { RedisProvider } from '../redis/redis.provider';
 import { RedisService } from '../redis/service/redis.service';
+import { ListGamesUseCase } from './use-case/list-games/list-games.use-case';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { RedisService } from '../redis/service/redis.service';
     RedisProvider,
     RedisService,
     SearchGamesUseCase,
+    ListGamesUseCase,
     {
       provide: 'RawgProvider',
       useClass: RawgProvider,

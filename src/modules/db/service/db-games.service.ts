@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { GamesEntity } from '../entities/games.entity';
 import { Repository } from 'typeorm';
 import { IGameCreate } from '../types/games/IGames';
+import { ListGamesInput } from 'src/modules/games/use-case/list-games/dto/list-games.dto';
 
 @Injectable()
 export class DbGamesService {
@@ -36,5 +37,23 @@ export class DbGamesService {
       coverImage: coverImage,
     });
     return await this.gamesRepository.save(newGame);
+  }
+
+  async listGames(filters: ListGamesInput): Promise<GamesEntity[]> {
+    const query = this.gamesRepository.createQueryBuilder('game');
+
+    if (filters.title) {
+      query.andWhere('LOWER(game.title) LIKE LOWER(:title)', {
+        title: `%${filters.title}%`,
+      });
+    }
+
+    if (filters.platform) {
+      query.andWhere('LOWER(game.platforms::text) LIKE LOWER(:platform)', {
+        platform: `%${filters.platform}%`,
+      });
+    }
+
+    return await query.getMany();
   }
 }
