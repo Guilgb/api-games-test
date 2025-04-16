@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  app:
+    container_name: games-api
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - '5002:5002'
+    environment:
+      - DATABASE_URL=postgres://admin:admin@db:5432/api_games
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - RAWG_API_KEY=ce96e569f10a48279757040a97b56201
+      - PORT=5002
+    depends_on:
+      - db
+      - redis
+
+  db:
+    container_name: postgres-db
+    image: postgres:14
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: api_games
+    ports:
+      - '5433:5433'
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  redis:
+    container_name: redis-cache
+    image: redis:7
+    restart: always
+    ports:
+      - '6379:6379'
+
+volumes:
+  postgres-data:
