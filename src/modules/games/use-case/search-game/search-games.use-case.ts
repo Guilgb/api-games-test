@@ -22,14 +22,13 @@ export class SearchGamesUseCase {
 
       const externalGameData = await this.rawgProvider.getGameByTitle(title);
 
-      return;
       const saveGame = await this.dbGamesService.save({
-        title: externalGameData.title,
-        description: externalGameData.description,
+        title: externalGameData.name,
+        description: externalGameData.description || null,
         platforms: externalGameData.platforms,
-        releaseDate: externalGameData.releaseDate,
+        releaseDate: externalGameData.released,
         rating: externalGameData.rating,
-        coverImage: externalGameData.coverImage,
+        coverImage: externalGameData.background_image,
       });
       return { source: 'Search games use case executed', data: saveGame };
     } catch (error) {

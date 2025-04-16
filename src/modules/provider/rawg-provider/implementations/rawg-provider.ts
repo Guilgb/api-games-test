@@ -11,8 +11,7 @@ export class RawgProvider implements RawgProviderInterface {
     try {
       const url = `https://api.rawg.io/api/games?search=${encodeURIComponent(name)}&key=${process.env.RAWG_API_KEY}`;
       const response = await lastValueFrom(this.httpService.get(url));
-      console.log(response.data.results);
-      return response;
+      return response.data.results[0];
     } catch (error) {
       throw new Error(`Failed to fetch game details: ${error.message}`);
     }

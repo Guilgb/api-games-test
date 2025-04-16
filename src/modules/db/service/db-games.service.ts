@@ -12,9 +12,11 @@ export class DbGamesService {
   ) {}
 
   async findByTitle(title: string): Promise<any> {
-    const result = await this.gamesRepository.findOneBy({
-      title,
-    });
+    const result = await this.gamesRepository
+      .createQueryBuilder('game')
+      .where('LOWER(game.title) LIKE LOWER(:title)', { title: `%${title}%` })
+      .getOne();
+
     if (!result) {
       return null;
     }

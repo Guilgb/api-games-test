@@ -1,3 +1,3 @@
 export interface RawgProviderInterface {
-  getGameByTitle(title): Promise<any>;
+  getGameByTitle(title: string): Promise<any>;
 }

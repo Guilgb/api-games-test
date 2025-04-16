@@ -17,7 +17,7 @@ export class GamesEntity {
   @Column({ type: 'date', name: 'release-date', nullable: true })
   releaseDate: Date;
 
-  @Column({ type: 'int', nullable: true })
+  @Column({ type: 'numeric', nullable: true })
   rating: number;
 
   @Column({ type: 'varchar', nullable: true })
