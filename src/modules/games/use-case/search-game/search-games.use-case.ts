@@ -2,6 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { DbGamesService } from 'src/modules/db/service/db-games.service';
 import { RawgProviderInterface } from 'src/modules/provider/rawg-provider/rawg-provider.interface';
 import { SearchGameInput } from './dto/search-game.dto';
+import { RedisService } from 'src/modules/redis/service/redis.service';
 
 @Injectable()
 export class SearchGamesUseCase {
@@ -9,20 +10,34 @@ export class SearchGamesUseCase {
     @Inject('RawgProvider')
     private readonly rawgProvider: RawgProviderInterface,
     private readonly dbGamesService: DbGamesService,
+    private readonly redisService: RedisService,
   ) {}
   async execute(input: SearchGameInput) {
     try {
       const { title } = input;
 
-      const cacheGame = await this.dbGamesService.findByTitle(title);
+      const cachedGame = await this.redisService.getByName(title);
+      if (cachedGame) {
+        return { source: 'cache', data: JSON.parse(cachedGame) };
+      }
 
-      if (cacheGame) {
-        return cacheGame;
+      const dbGame = await this.dbGamesService.findByTitle(title);
+      if (dbGame) {
+        await this.redisService.save(title, {
+          title: dbGame.title,
+          description: dbGame.description,
+          platforms: dbGame.platforms,
+          releaseDate: dbGame.releaseDate,
+          rating: dbGame.rating,
+          coverImage: dbGame.coverImage,
+        });
+
+        return { source: 'database', data: dbGame };
       }
 
       const externalGameData = await this.rawgProvider.getGameByTitle(title);
 
-      const saveGame = await this.dbGamesService.save({
+      const savedGame = await this.dbGamesService.save({
         title: externalGameData.name,
         description: externalGameData.description || null,
         platforms: externalGameData.platforms,
@@ -30,7 +45,17 @@ export class SearchGamesUseCase {
         rating: externalGameData.rating,
         coverImage: externalGameData.background_image,
       });
-      return { source: 'Search games use case executed', data: saveGame };
+
+      await this.redisService.save(title, {
+        title: savedGame.title,
+        description: savedGame.description,
+        platforms: savedGame.platforms,
+        releaseDate: savedGame.releaseDate,
+        rating: savedGame.rating,
+        coverImage: savedGame.coverImage,
+      });
+
+      return { source: 'api', data: savedGame };
     } catch (error) {
       console.error('Error executing SearchGamesUseCase:', error);
       throw error;

@@ -11,7 +11,7 @@ export class DbGamesService {
     private readonly gamesRepository: Repository<GamesEntity>,
   ) {}
 
-  async findByTitle(title: string): Promise<any> {
+  async findByTitle(title: string): Promise<GamesEntity> {
     const result = await this.gamesRepository
       .createQueryBuilder('game')
       .where('LOWER(game.title) LIKE LOWER(:title)', { title: `%${title}%` })

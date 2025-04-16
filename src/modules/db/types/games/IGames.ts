@@ -10,3 +10,12 @@ export interface IGameCreate {
   rating: number;
   coverImage: string;
 }
+export interface IGameCreateResponse {
+  id: number;
+  title: string;
+  description: string;
+  platforms: any;
+  releaseDate: Date;
+  rating: number;
+  coverImage: string;
+}

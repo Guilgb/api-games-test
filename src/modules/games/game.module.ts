@@ -7,6 +7,8 @@ import { GamesController } from './game.controller';
 import { SearchGamesUseCase } from './use-case/search-game/search-games.use-case';
 import { RawgProvider } from '../provider/rawg-provider/implementations/rawg-provider';
 import { DbGamesService } from '../db/service/db-games.service';
+import { RedisProvider } from '../redis/redis.provider';
+import { RedisService } from '../redis/service/redis.service';
 
 @Module({
   imports: [
@@ -17,6 +19,8 @@ import { DbGamesService } from '../db/service/db-games.service';
   controllers: [GamesController],
   providers: [
     DbGamesService,
+    RedisProvider,
+    RedisService,
     SearchGamesUseCase,
     {
       provide: 'RawgProvider',
