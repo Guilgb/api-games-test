@@ -3,14 +3,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { GamesEntity } from '../entities/games.entity';
 import { Repository } from 'typeorm';
 import { IGameCreate } from '../types/games/IGames';
-import { ListGamesInput } from '@modules/games/use-case/list-games/dto/list-games.dto';
+import { ListGamesDto } from '@modules/games/use-case/list-games/dto/list-games.dto';
 
 @Injectable()
 export class DbGamesService {
   constructor(
     @InjectRepository(GamesEntity)
     private readonly gamesRepository: Repository<GamesEntity>,
-  ) {}
+  ) { }
 
   async findByTitle(title: string): Promise<GamesEntity> {
     const result = await this.gamesRepository
@@ -39,7 +39,7 @@ export class DbGamesService {
     return await this.gamesRepository.save(newGame);
   }
 
-  async listGames(filters: ListGamesInput): Promise<GamesEntity[]> {
+  async listGames(filters: ListGamesDto): Promise<GamesEntity[]> {
     const query = this.gamesRepository.createQueryBuilder('game');
 
     if (filters.title) {

@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { ListGamesInput } from './dto/list-games.dto';
+import { ListGamesDto } from './dto/list-games.dto';
 import { DbGamesService } from '@modules/db/service/db-games.service';
 
 @Injectable()
 export class ListGamesUseCase {
   constructor(private readonly dbGamesService: DbGamesService) {}
 
-  async execute(filters?: ListGamesInput) {
+  async execute(filters?: ListGamesDto) {
     const { title, platform, page, limit } = filters || {};
 
     const games = await this.dbGamesService.listGames({ title, platform });

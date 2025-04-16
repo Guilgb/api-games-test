@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { SearchGameInput } from './dto/search-game.dto';
+import { SearchGameDto } from './dto/search-game.dto';
 import { RawgProviderInterface } from '@modules/provider/rawg-provider/rawg-provider.interface';
 import { DbGamesService } from '@modules/db/service/db-games.service';
 import { RedisService } from '@modules/redis/service/redis.service';
@@ -12,7 +12,7 @@ export class SearchGamesUseCase {
     private readonly dbGamesService: DbGamesService,
     private readonly redisService: RedisService,
   ) {}
-  async execute(input: SearchGameInput) {
+  async execute(input: SearchGameDto) {
     try {
       const { title } = input;
 
