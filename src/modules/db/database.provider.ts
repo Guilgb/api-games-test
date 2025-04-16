@@ -1,5 +1,5 @@
 import { DataSource, EntityManager } from 'typeorm';
-import { entitiesList } from 'src/modules/db/entities';
+import { entitiesList } from './entities';
 
 let dataSource: DataSource;
 const getDatabaseConnection = async (): Promise<EntityManager> => {

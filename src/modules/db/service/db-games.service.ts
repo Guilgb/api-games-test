@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { GamesEntity } from '../entities/games.entity';
 import { Repository } from 'typeorm';
 import { IGameCreate } from '../types/games/IGames';
-import { ListGamesInput } from 'src/modules/games/use-case/list-games/dto/list-games.dto';
+import { ListGamesInput } from '@modules/games/use-case/list-games/dto/list-games.dto';
 
 @Injectable()
 export class DbGamesService {

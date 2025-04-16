@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { IGameCreate } from 'src/modules/db/types/games/IGames';
 import { RedisProvider } from '../redis.provider';
+import { IGameCreate } from '@modules/db/types/games/IGames';
 
 @Injectable()
 export class RedisService {

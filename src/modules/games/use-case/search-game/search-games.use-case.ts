@@ -1,8 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { DbGamesService } from 'src/modules/db/service/db-games.service';
-import { RawgProviderInterface } from 'src/modules/provider/rawg-provider/rawg-provider.interface';
 import { SearchGameInput } from './dto/search-game.dto';
-import { RedisService } from 'src/modules/redis/service/redis.service';
+import { RawgProviderInterface } from '@modules/provider/rawg-provider/rawg-provider.interface';
+import { DbGamesService } from '@modules/db/service/db-games.service';
+import { RedisService } from '@modules/redis/service/redis.service';
 
 @Injectable()
 export class SearchGamesUseCase {

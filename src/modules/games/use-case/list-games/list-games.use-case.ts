@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { DbGamesService } from 'src/modules/db/service/db-games.service';
 import { ListGamesInput } from './dto/list-games.dto';
+import { DbGamesService } from '@modules/db/service/db-games.service';
 
 @Injectable()
 export class ListGamesUseCase {
