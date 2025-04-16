@@ -1,3 +1,3 @@
-export interface SearchGameDTO {
-  name: string;
+export interface SearchGameInput {
+  title: string;
 }

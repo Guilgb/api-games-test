@@ -5,7 +5,7 @@ export class GamesEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'varchar', nullable: false })
+  @Column({ type: 'varchar', nullable: true })
   title: string;
 
   @Column({ type: 'varchar', nullable: true })

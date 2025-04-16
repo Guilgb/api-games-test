@@ -11,14 +11,17 @@ export class DbGamesService {
     private readonly gamesRepository: Repository<GamesEntity>,
   ) {}
 
-  async getByName(title: string): Promise<GamesEntity> {
+  async findByTitle(title: string): Promise<any> {
     const result = await this.gamesRepository.findOneBy({
       title,
     });
+    if (!result) {
+      return null;
+    }
     return result;
   }
 
-  async createTitle(input: IGameCreate): Promise<GamesEntity> {
+  async save(input: IGameCreate): Promise<GamesEntity> {
     const { title, description, platforms, releaseDate, rating, coverImage } =
       input;
 
