@@ -19,9 +19,7 @@ import { entitiesList } from './entities';
         entities: [...entitiesList],
         migrations: [__dirname + 'src/modules/db/migrations/*.ts'],
         synchronize: true,
-        ssl: {
-          rejectUnauthorized: false,
-        },
+        ssl: false,
       }),
       inject: [ConfigService],
     }),

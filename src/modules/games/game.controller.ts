@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, Query } from '@nestjs/common';
 import { SearchGamesUseCase } from './use-case/search-game/search-games.use-case';
 import { SearchGameDto } from './use-case/search-game/dto/search-game.dto';
 import { ListGamesUseCase } from './use-case/list-games/list-games.use-case';
@@ -20,7 +20,7 @@ export class GamesController {
   }
 
   @Get()
-  async listGames(@Body() input: ListGamesDto) {
+  async listGames(@Query() input: ListGamesDto) {
     return await this.listGamesUseCase.execute(input);
   }
 }
