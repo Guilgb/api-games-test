@@ -47,24 +47,53 @@ Certifique-se de ter as seguintes ferramentas instaladas:
 
 ## Instalação
 
-1. Clone o repositório:
-   ```bash
-   git clone https://github.com/seu-usuario/age-games-api.git
-   cd age-games-api
-   ```
-2. Instale as dependências:
-    ```bash
-    npm install
-    ```
+### Usando Docker (Recomendado)
+
+1. Certifique-se de ter o [Docker](https://www.docker.com/) e o [Docker Compose](https://docs.docker.com/compose/) instalados.
+
+2. Clone o repositório:
+  ```bash
+  git clone https://github.com/seu-usuario/age-games-api.git
+  cd age-games-api
+  ```
 
 3. Configure as variáveis de ambiente:
-    - Crie um arquivo `.env` na raiz do projeto com base no arquivo `.env.example`.
-    - Preencha as variáveis necessárias, como credenciais do banco de dados e da API RAWG.
+  - Crie um arquivo `.env` na raiz do projeto com base no arquivo `.env.example`.
+  - Preencha as variáveis necessárias, como credenciais do banco de dados e da API RAWG.
 
-4. Inicie o servidor de desenvolvimento:
-    ```bash
-    npm run start:dev
-    ```
+4. Inicie os serviços:
+  ```bash
+  docker-compose up
+  ```
 
 5. Acesse a documentação da API:
-    - Acesse `http://localhost:3000/api` para visualizar a documentação interativa gerada pelo Swagger.
+  - Acesse `http://localhost:3000/api` para visualizar a documentação interativa gerada pelo Swagger.
+
+---
+
+### Rodando Localmente (Alternativa)
+
+1. Certifique-se de ter o [Node.js](https://nodejs.org/), [PostgreSQL](https://www.postgresql.org/) e [Redis](https://redis.io/) instalados.
+
+2. Clone o repositório:
+  ```bash
+  git clone https://github.com/seu-usuario/age-games-api.git
+  cd age-games-api
+  ```
+
+3. Instale as dependências:
+  ```bash
+  npm install --force
+  ```
+
+4. Configure as variáveis de ambiente:
+  - Crie um arquivo `.env` na raiz do projeto com base no arquivo `.env.example`.
+  - Preencha as variáveis necessárias, como credenciais do banco de dados e da API RAWG.
+
+5. Inicie o servidor de desenvolvimento:
+  ```bash
+  npm run start:dev
+  ```
+
+6. Acesse a documentação da API:
+  - Acesse `http://localhost:3000/api` para visualizar a documentação interativa gerada pelo Swagger.
