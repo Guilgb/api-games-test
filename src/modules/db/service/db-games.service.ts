@@ -10,7 +10,7 @@ export class DbGamesService {
   constructor(
     @InjectRepository(GamesEntity)
     private readonly gamesRepository: Repository<GamesEntity>,
-  ) { }
+  ) {}
 
   async findByTitle(title: string): Promise<GamesEntity> {
     const result = await this.gamesRepository

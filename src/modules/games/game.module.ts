@@ -7,9 +7,8 @@ import { GamesController } from './game.controller';
 import { SearchGamesUseCase } from './use-case/search-game/search-games.use-case';
 import { RawgProvider } from '../provider/rawg-provider/implementations/rawg-provider';
 import { DbGamesService } from '../db/service/db-games.service';
-import { RedisProvider } from '../redis/redis.provider';
-import { RedisService } from '../redis/service/redis.service';
 import { ListGamesUseCase } from './use-case/list-games/list-games.use-case';
+import { RedisCacheService } from '@modules/redis/service/redis-cache.service';
 
 @Module({
   imports: [
@@ -20,8 +19,7 @@ import { ListGamesUseCase } from './use-case/list-games/list-games.use-case';
   controllers: [GamesController],
   providers: [
     DbGamesService,
-    RedisProvider,
-    RedisService,
+    RedisCacheService,
     SearchGamesUseCase,
     ListGamesUseCase,
     {
