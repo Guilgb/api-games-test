@@ -1,10 +1,13 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, Query, UseGuards } from '@nestjs/common';
 import { SearchGamesUseCase } from './use-case/search-game/search-games.use-case';
 import { SearchGameDto } from './use-case/search-game/dto/search-game.dto';
 import { ListGamesUseCase } from './use-case/list-games/list-games.use-case';
 import { ListGamesDto } from './use-case/list-games/dto/list-games.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { AuthGuard } from '@nestjs/passport';
 
+@ApiBearerAuth('JWT')
+@UseGuards(AuthGuard('jwt'))
 @ApiTags('Games')
 @Controller('/game')
 export class GamesController {
