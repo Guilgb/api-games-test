@@ -53,7 +53,7 @@ Certifique-se de ter as seguintes ferramentas instaladas:
 
 2. Clone o repositório:
   ```bash
-  git clone https://github.com/seu-usuario/age-games-api.git
+  git clone https://github.com/Guilgb/api-games-test.git
   cd age-games-api
   ```
 
@@ -94,7 +94,7 @@ Certifique-se de ter as seguintes ferramentas instaladas:
 
 2. Clone o repositório:
   ```bash
-  git clone https://github.com/seu-usuario/age-games-api.git
+  git clone https://github.com/Guilgb/api-games-test.git
   cd age-games-api
   ```
 
@@ -106,6 +106,23 @@ Certifique-se de ter as seguintes ferramentas instaladas:
 4. Configure as variáveis de ambiente:
   - Crie um arquivo `.env` na raiz do projeto com base no arquivo `.env.example`.
   - Preencha as variáveis necessárias, como credenciais do banco de dados e da API RAWG.
+  
+    4.1. Gere as chaves necessárias:
+    - Para autenticação JWT, você precisará de uma **private key** e uma **public key**. Use o comando abaixo para gerá-las:
+
+      ```bash
+      openssl genrsa -out private.key 2048
+      openssl rsa -in private.key -pubout -out public.key
+      ```
+
+    - Para a integração com a API RAWG, obtenha uma **secret key** diretamente no [painel de desenvolvedor da RAWG](https://rawg.io/apidocs).
+
+    4.2. Adicione as chaves ao arquivo `.env`:
+      ```env
+      JWT_PRIVATE_KEY=./private.key
+      JWT_PUBLIC_KEY=./public.key
+      RAWG_SECRET_KEY=sua_secret_key_aqui
+      ```
 
 5. Inicie o servidor de desenvolvimento:
   ```bash
