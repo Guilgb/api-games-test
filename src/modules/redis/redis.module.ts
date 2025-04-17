@@ -13,7 +13,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
         configService: ConfigService,
       ): Promise<RedisModuleOptions> => ({
         type: 'single',
-        url: `redis://${configService.get<string>('REDIS_HOST')}:${configService.get<number>('REDIS_PORT')}`,
+        url: `redis://${configService.get<string>('REDIS_HOST', 'redis')}:${configService.get<number>('REDIS_PORT', 6379)}`,
       }),
       inject: [ConfigService],
     }),
