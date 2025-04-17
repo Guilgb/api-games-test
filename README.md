@@ -30,7 +30,7 @@ A **Games API** é uma aplicação backend desenvolvida com o framework [NestJS]
 - **Banco de Dados**: PostgreSQL (via TypeORM)
 - **Cache**: Redis
 - **Integração Externa**: API da RAWG
-- **Documentação**: Swagger
+- **Autenticação**: JWT (JSON Web Token) para proteger rotas e gerenciar sessões de usuários.
 
 ---
 
@@ -60,6 +60,23 @@ Certifique-se de ter as seguintes ferramentas instaladas:
 3. Configure as variáveis de ambiente:
   - Crie um arquivo `.env` na raiz do projeto com base no arquivo `.env.example`.
   - Preencha as variáveis necessárias, como credenciais do banco de dados e da API RAWG.
+    
+    3.1. Gere as chaves necessárias:
+    - Para autenticação JWT, você precisará de uma **private key** e uma **public key**. Use o comando abaixo para gerá-las:
+
+      ```bash
+      openssl genrsa -out private.key 2048
+      openssl rsa -in private.key -pubout -out public.key
+      ```
+
+    - Para a integração com a API RAWG, obtenha uma **secret key** diretamente no [painel de desenvolvedor da RAWG](https://rawg.io/apidocs).
+
+    3.2. Adicione as chaves ao arquivo `.env`:
+      ```env
+      JWT_PRIVATE_KEY=./private.key
+      JWT_PUBLIC_KEY=./public.key
+      RAWG_SECRET_KEY=sua_secret_key_aqui
+      ```
 
 4. Inicie os serviços:
   ```bash
@@ -67,7 +84,7 @@ Certifique-se de ter as seguintes ferramentas instaladas:
   ```
 
 5. Acesse a documentação da API:
-  - Acesse `http://localhost:3000/api` para visualizar a documentação interativa gerada pelo Swagger.
+  - Acesse `http://localhost:5002/api` para visualizar a documentação interativa gerada pelo Swagger.
 
 ---
 
@@ -96,4 +113,4 @@ Certifique-se de ter as seguintes ferramentas instaladas:
   ```
 
 6. Acesse a documentação da API:
-  - Acesse `http://localhost:3000/api` para visualizar a documentação interativa gerada pelo Swagger.
+  - Acesse `http://localhost:5002/api` para visualizar a documentação interativa gerada pelo Swagger.
