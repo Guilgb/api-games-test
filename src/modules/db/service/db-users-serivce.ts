@@ -10,7 +10,7 @@ export class DBUsersService {
     @InjectRepository(UsersEntity)
     private readonly userRepository: Repository<UsersEntity>,
   ) {}
-  async createUser(input: CreateUserDto): Promise<any> {
+  async createUser(input: CreateUserDto): Promise<UsersEntity> {
     const user = await this.userRepository.save({
       name: input.name,
       email: input.email,
@@ -25,7 +25,7 @@ export class DBUsersService {
     return user;
   }
 
-  async getUserByEmail(email: string): Promise<any> {
+  async getUserByEmail(email: string): Promise<UsersEntity> {
     return this.userRepository.findOne({ where: { email } });
   }
 }

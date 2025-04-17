@@ -15,7 +15,7 @@ export class RedisCacheService {
     await this.cache.set(key, value, ttl);
   }
 
-  async save(title: string, input: IGameCreate): Promise<any> {
+  async save(title: string, input: IGameCreate): Promise<string> {
     const result = await this.cache.set(title, JSON.stringify(input));
     return result;
   }
