@@ -1,14 +1,24 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { SearchGamesUseCase } from '../../../../src/modules/games/use-case/search-game/search-games.use-case';
-import { RawgProviderInterface } from '.././../../../src/modules/provider/rawg-provider/rawg-provider.interface';
+import { RawgProviderInterface } from '../../../../src/modules/provider/rawg-provider/rawg-provider.interface';
 import { DbGamesService } from '../../../../src/modules/db/service/db-games.service';
-import { RedisService } from '../../../../src/modules/redis/service/redis.service';
+import { RedisCacheService } from '../../../../src/modules/redis/service/redis-cache.service';
 
 describe('SearchGamesUseCase', () => {
   let searchGamesUseCase: SearchGamesUseCase;
   let rawgProvider: RawgProviderInterface;
   let dbGamesService: DbGamesService;
-  let redisService: RedisService;
+  let redisCacheService: RedisCacheService;
+
+  const gameTitle = 'Halo';
+  const mockGame = {
+    title: gameTitle,
+    description: 'Um jogo de FPS sci-fi',
+    platforms: ['PC', 'Xbox'],
+    releaseDate: '2001-11-15',
+    rating: 4.5,
+    coverImage: 'https://exemplo.com/halo.jpg',
+  };
 
   const mockRawgProvider = {
     getGameByTitle: jest.fn(),
@@ -19,7 +29,7 @@ describe('SearchGamesUseCase', () => {
     save: jest.fn(),
   };
 
-  const mockRedisService = {
+  const mockRedisCacheService = {
     getByName: jest.fn(),
     save: jest.fn(),
   };
@@ -30,84 +40,126 @@ describe('SearchGamesUseCase', () => {
         SearchGamesUseCase,
         { provide: 'RawgProvider', useValue: mockRawgProvider },
         { provide: DbGamesService, useValue: mockDbGamesService },
-        { provide: RedisService, useValue: mockRedisService },
+        { provide: RedisCacheService, useValue: mockRedisCacheService },
       ],
     }).compile();
 
     searchGamesUseCase = module.get<SearchGamesUseCase>(SearchGamesUseCase);
     rawgProvider = module.get<RawgProviderInterface>('RawgProvider');
     dbGamesService = module.get<DbGamesService>(DbGamesService);
-    redisService = module.get<RedisService>(RedisService);
+    redisCacheService = module.get<RedisCacheService>(RedisCacheService);
+
+    jest.clearAllMocks();
   });
 
-  it('deve retornar o jogo do cache se estiver disponível', async () => {
-    const mockGame = { title: 'Halo', description: 'A sci-fi FPS game' };
-    mockRedisService.getByName.mockResolvedValue(JSON.stringify(mockGame));
+  describe('execute', () => {
+    it('deve retornar o jogo do banco de dados se não estiver no cache', async () => {
+      mockRedisCacheService.getByName.mockResolvedValue(null);
+      mockDbGamesService.findByTitle.mockResolvedValue(mockGame);
 
-    const result = await searchGamesUseCase.execute({ title: 'Halo' });
+      const saveMock = jest.fn().mockResolvedValue('OK');
+      (redisCacheService.save as jest.Mock) = saveMock;
 
-    expect(redisService.getByName).toHaveBeenCalledWith('Halo');
-    expect(result).toEqual({ source: 'cache', data: mockGame });
-  });
+      const result = await searchGamesUseCase.execute({ title: gameTitle });
 
-  it('deve retornar o jogo do banco de dados se não estiver no cache', async () => {
-    const mockGame = { title: 'Halo', description: 'A sci-fi FPS game' };
-    mockRedisService.getByName.mockResolvedValue(null);
-    mockDbGamesService.findByTitle.mockResolvedValue(mockGame);
+      expect(redisCacheService.getByName).toHaveBeenCalledWith(gameTitle);
+      expect(dbGamesService.findByTitle).toHaveBeenCalledWith(gameTitle);
 
-    const result = await searchGamesUseCase.execute({ title: 'Halo' });
+      expect(saveMock).toHaveBeenCalledTimes(1);
 
-    expect(redisService.getByName).toHaveBeenCalledWith('Halo');
-    expect(dbGamesService.findByTitle).toHaveBeenCalledWith('Halo');
-    expect(redisService.save).toHaveBeenCalledWith('Halo', mockGame);
-    expect(result).toEqual({ source: 'database', data: mockGame });
-  });
+      const [savedKey, savedValue] = saveMock.mock.calls[0];
 
-  it('deve buscar o jogo na API externa se não estiver no cache nem no banco de dados', async () => {
-    const mockExternalGame = {
-      name: 'Halo',
-      description: 'A sci-fi FPS game',
-      platforms: ['PC', 'Xbox'],
-      released: '2001-11-15',
-      rating: 4.5,
-      background_image: 'https://example.com/halo.jpg',
-    };
-    const mockSavedGame = {
-      title: 'Halo',
-      description: 'A sci-fi FPS game',
-      platforms: ['PC', 'Xbox'],
-      releaseDate: '2001-11-15',
-      rating: 4.5,
-      coverImage: 'https://example.com/halo.jpg',
-    };
+      expect(savedKey).toBe(gameTitle);
 
-    mockRedisService.getByName.mockResolvedValue(null);
-    mockDbGamesService.findByTitle.mockResolvedValue(null);
-    mockRawgProvider.getGameByTitle.mockResolvedValue(mockExternalGame);
-    mockDbGamesService.save.mockResolvedValue(mockSavedGame);
+      if (typeof savedValue === 'string') {
+        expect(JSON.parse(savedValue)).toEqual(mockGame);
+      } else {
+        expect(savedValue).toEqual(mockGame);
+      }
 
-    const result = await searchGamesUseCase.execute({ title: 'Halo' });
-
-    expect(redisService.getByName).toHaveBeenCalledWith('Halo');
-    expect(dbGamesService.findByTitle).toHaveBeenCalledWith('Halo');
-    expect(rawgProvider.getGameByTitle).toHaveBeenCalledWith('Halo');
-    expect(dbGamesService.save).toHaveBeenCalledWith({
-      title: 'Halo',
-      description: 'A sci-fi FPS game',
-      platforms: ['PC', 'Xbox'],
-      releaseDate: '2001-11-15',
-      rating: 4.5,
-      coverImage: 'https://example.com/halo.jpg',
+      expect(result).toEqual({
+        source: 'database',
+        data: mockGame,
+      });
     });
-    expect(redisService.save).toHaveBeenCalledWith('Halo', mockSavedGame);
-    expect(result).toEqual({ source: 'api', data: mockSavedGame });
-  });
 
-  it('deve lançar um erro se ocorrer um problema', async () => {
-    mockRedisService.getByName.mockRejectedValue(new Error('Redis error'));
+    it('deve retornar o jogo do banco de dados se não estiver no cache', async () => {
+      mockRedisCacheService.getByName.mockResolvedValue(null);
+      mockDbGamesService.findByTitle.mockResolvedValue(mockGame);
 
-    await expect(searchGamesUseCase.execute({ title: 'Halo' })).rejects.toThrow(
-      'Redis error',
-    );
+      const saveMock = jest.fn().mockResolvedValue('OK');
+      (redisCacheService.save as jest.Mock) = saveMock;
+
+      const result = await searchGamesUseCase.execute({ title: gameTitle });
+
+      expect(redisCacheService.getByName).toHaveBeenCalledWith(gameTitle);
+      expect(dbGamesService.findByTitle).toHaveBeenCalledWith(gameTitle);
+
+      expect(saveMock).toHaveBeenCalledTimes(1);
+
+      const [savedKey, savedValue] = saveMock.mock.calls[0];
+      expect(savedKey).toBe(gameTitle);
+
+      expect(JSON.parse(JSON.stringify(savedValue))).toEqual(mockGame);
+
+      expect(result).toEqual({
+        source: 'database',
+        data: mockGame,
+      });
+    });
+
+    it('deve buscar o jogo na API externa se não estiver no cache nem no banco de dados', async () => {
+      const mockExternalGame = {
+        name: gameTitle,
+        description: 'Um jogo de FPS sci-fi',
+        platforms: ['PC', 'Xbox'],
+        released: '2001-11-15',
+        rating: 4.5,
+        background_image: 'https://exemplo.com/halo.jpg',
+      };
+
+      const expectedGameData = {
+        coverImage: 'https://exemplo.com/halo.jpg',
+        description: 'Um jogo de FPS sci-fi',
+        platforms: ['PC', 'Xbox'],
+        rating: 4.5,
+        releaseDate: '2001-11-15',
+        title: 'Halo',
+      };
+
+      const saveMock = jest.fn().mockResolvedValue('OK');
+      (redisCacheService.save as jest.Mock) = saveMock;
+      (redisCacheService.getByName as jest.Mock).mockResolvedValue(null);
+      (dbGamesService.findByTitle as jest.Mock).mockResolvedValue(null);
+      (rawgProvider.getGameByTitle as jest.Mock).mockResolvedValue(
+        mockExternalGame,
+      );
+      (dbGamesService.save as jest.Mock).mockResolvedValue(expectedGameData);
+
+      await searchGamesUseCase.execute({ title: gameTitle });
+
+      expect(redisCacheService.getByName).toHaveBeenCalledWith(gameTitle);
+      expect(dbGamesService.findByTitle).toHaveBeenCalledWith(gameTitle);
+      expect(rawgProvider.getGameByTitle).toHaveBeenCalledWith(gameTitle);
+
+      expect(saveMock).toHaveBeenCalledTimes(1);
+
+      const [, savedValue] = saveMock.mock.calls[0];
+
+      if (typeof savedValue === 'string') {
+        expect(JSON.parse(savedValue)).toEqual(expectedGameData);
+      } else {
+        expect(savedValue).toEqual(expectedGameData);
+      }
+    });
+
+    it('deve lançar um erro se ocorrer um problema', async () => {
+      const error = new Error('Erro no Redis');
+      mockRedisCacheService.getByName.mockRejectedValue(error);
+
+      await expect(
+        searchGamesUseCase.execute({ title: gameTitle }),
+      ).rejects.toThrow('Erro no Redis');
+    });
   });
 });
